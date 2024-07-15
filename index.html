@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Server Dashboard</h1>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <h3>Server Statistics</h3>
+                <p>CPU Usage: <span id="cpu">Loading...</span>%</p>
+                <p>Memory Usage: <span id="memory">Loading...</span>%</p>
+                <p>Disk Usage: <span id="disk">Loading...</span>%</p>
+            </div>
+            <div class="col-md-4">
+                <h3>Message Statistics</h3>
+                <p>Messages Sent: <span id="messages_sent">Loading...</span></p>
+                <p>Messages Received: <span id="messages_received">Loading...</span></p>
+            </div>
+            <div class="col-md-4">
+                <h3>User List</h3>
+                <ul id="user_list">Loading...</ul>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h3>Groups</h3>
+                <ul id="groups">Loading...</ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchServerStats() {
+                $.getJSON('/server_stats', function(data) {
+                    $('#cpu').text(data.cpu);
+                    $('#memory').text(data.memory);
+                    $('#disk').text(data.disk);
+                });
+            }
+
+            function fetchMessageStats() {
+                $.getJSON('/message_stats', function(data) {
+                    $('#messages_sent').text(data.messages_sent);
+                    $('#messages_received').text(data.messages_received);
+                });
+            }
+
+            function fetchUserList() {
+                $.getJSON('/user_list', function(data) {
+                    var userList = $('#user_list');
+                    userList.empty();
+                    data.users.forEach(function(user) {
+                        userList.append('<li>' + user + '</li>');
+                    });
+                });
+            }
+
+            function fetchGroups() {
+                $.getJSON('/groups', function(data) {
+                    var groupsList = $('#groups');
+                    groupsList.empty();
+                    data.groups.forEach(function(group) {
+                        groupsList.append('<li>' + group + '</li>');
+                    });
+                });
+            }
+
+            fetchServerStats();
+            fetchMessageStats();
+            fetchUserList();
+            fetchGroups();
+
+            setInterval(fetchServerStats, 5000);
+            setInterval(fetchMessageStats, 5000);
+            setInterval(fetchUserList, 10000);
+            setInterval(fetchGroups, 10000);
+        });
+    </script>
+</body>
+</html>
